@@ -1,0 +1,34 @@
+---
+title: "Portfolio Theory: Assignment 1"
+subtitle: "The Statistics of Strategy Back-Testing"
+author: "Nesan Naidoo : NDXNES005"
+date: "`r Sys.Date()`"
+output: pdf_document
+bibliography: Sources.bib
+fontsize: 12pt
+---
+
+# Problem Specification
+
+# Data Specification
+
+# Configuration control
+
+#  PART I : Introduction to Strategy Backtesting
+##  Question 1 : Sample Error when Estimating the Sharpe Ratio
+
+##  Question 2 : The Maximum of the Sample
+
+## Question 3 : Minimum Backtest Length
+
+# PART II : Backtest Performance of the Tangency Portfolio
+## Experiment 1 : In-Sample and Out-Of-Sample Sharpe Ratios
+
+
+## Experiment 2 : Out-Of-Sample Backtesting using a Rolling Window
+
+# Appendix A : Code
+
+# Appendix B : Session Information
+
+# References
