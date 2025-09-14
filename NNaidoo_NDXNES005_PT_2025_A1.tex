@@ -1,0 +1,622 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  12pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{etoolbox}
+\apptocmd{\thebibliography}{\setlength{\itemsep}{1.0\baselineskip}}{}{}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{fvextra}
+\usepackage{adjustbox}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Portfolio Theory: Assignment 1},
+  pdfauthor={Nesan Naidoo : NDXNES005},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Portfolio Theory: Assignment 1}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{The Statistics of Strategy Back-Testing}
+\author{Nesan Naidoo : NDXNES005}
+\date{2025-09-15}
+
+\begin{document}
+\maketitle
+
+\section{Problem Specification}\label{problem-specification}
+
+This assignment examined the statistics of strategy backtesting within
+the context of portfolio theory. Part I focused on proving that the
+estimated annualized Sharpe ratio(SR) converges asymptotically to a
+normal distribution. Furthermore, part I motivated that for a
+sufficiently large number of samples, the mean of the sample maximum of
+standard normally distributed random variables can be approximated.
+Lastly, part I focused on the derivation and discussion of the minimum
+backtest length.
+
+Part II focused on mean--variance backtesting of the tangency portfolio
+under full investment and no-short-selling constraints. Sharpe
+ratio--maximising portfolios are computed from rolling windows of the
+historical data. The historical dataset is divided into in-sample (IS)
+and out-of-sample (OOS) datasets. Two experiments are conducted: 1)
+compared IS and OOS Sharpe ratios and 2) evaluated OOS backtest
+performance using a rolling window approach.
+
+\section{Data Specification}\label{data-specification}
+
+The Tactical Asset Allocation data is from
+PT-DATA-ALBI-JIBAR-JSEIND-Daily-1994-2017.xlsx
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  ICB Industrial Level Indices
+\item
+  ALBI (All Bond Index (ALBI) Total Return Index (TRI) Data)
+\item
+  Money Market Data: JIBAR and STEFI TRI
+\item
+  Various Indices: JSE Growth, JSE Value, JSE ALSI, JSE SRI
+\end{enumerate}
+
+\section{Configuration control}\label{configuration-control}
+
+Version control: managed with Git and GitHub.
+
+Project structure:
+
+Click on link to repository:
+\href{https://github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting}{github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting}
+
+\section{PART I : Introduction to Strategy
+Backtesting}\label{part-i-introduction-to-strategy-backtesting}
+
+\subsection{Question 1 : Sample Error when Estimating the Sharpe
+Ratio}\label{question-1-sample-error-when-estimating-the-sharpe-ratio}
+
+Proof below is based on the asymptotic distributions of Sharpe Ratio
+estimators (See Appendix A. IID Returns in (Lo 2002) )
+
+\subsubsection{1.1 Assumptions}\label{assumptions}
+
+\begin{itemize}
+\item
+  We assume IID excess returns \(r_1,\dots,r_n\) with
+  \(r_t \sim \mathcal{N}(\mu,\sigma^2).\)
+\item
+  Let \(q\) be returns per year, \(y\) the number of years, and
+  \(n=qy\).
+\item
+  The true annualised Sharpe is \(SR=\sqrt{q}\,\frac{\mu}{\sigma}.\)
+\item
+  Estimators used in proof: \[
+  \widehat\mu=\frac{1}{n}\sum_{t=1}^n r_t,\quad
+  \widehat\sigma^2=\frac{1}{n}\sum_{t=1}^n (r_t-\widehat\mu)^2,\quad
+  \widehat{SR}=\sqrt{q}\,\frac{\widehat\mu}{\widehat\sigma}.
+  \]
+\end{itemize}
+
+\subsubsection{1.2 Distribution of the sample
+mean}\label{distribution-of-the-sample-mean}
+
+Since \(r_t\sim \mathcal{N}(\mu,\sigma^2)\) and using the fact the the
+sum of independent Normal variables are Normal. Therefore,\[
+\sum_{t=1}^n r_t \sim N\!\big(n\mu,\; n\sigma^2\big). \tag{1}
+\]
+
+Therefore, the sample mean \(\widehat\mu=\dfrac{1}{n}\sum_{t=1}^n r_t\)
+follows a Normal distribution \[
+\widehat\mu \sim N\!\Big(\mu,\; \frac{\sigma^2}{n}\Big). \tag{2}
+\]
+
+Hence, by centering and scaling by \(\sqrt{n}\) , this leads to \[
+\sqrt{n}\,(\widehat\mu-\mu) \sim \mathcal{N}(0,\sigma^2). \tag{3}
+\]
+
+\subsubsection{1.3 Distribution of the sample
+variance}\label{distribution-of-the-sample-variance}
+
+Given
+\(\widehat\sigma^2 \;=\; \frac{1}{n}\sum_{t=1}^n (r_t - \widehat\mu)^2\)
+, then the result based on Normal theory is
+\(\frac{n\widehat\sigma^2}{\sigma^2} \;\sim\; \chi^2_{\,n-1}.\)
+
+If \(U \sim \chi^2_k\) then \(\mathbb{E}[U]=k\) and
+\(\operatorname{Var}(U)=2k.\)
+
+Hence, to standardise \(U\) we subtract its mean \(k\) and divide by its
+standard deviation \(\sqrt{2k}\).\\
+Let \(k=n-1\) and \(U = \dfrac{n\widehat\sigma^2}{\sigma^2}\) . Using
+the fact that \(\chi_{n-1}^2\), is the sum of \(n-1\) independent
+\(Z_i^2\) terms, where each \(Z_i^2\) has mean 1 and variance 2 and by
+the Central Limit Theorem , the centered and scaled sum converges to
+\(\mathcal{N}(0,1)\) as \(n \to \infty\). Therefore,
+
+\[
+\frac{\dfrac{n\widehat\sigma^2}{\sigma^2}-(n-1)}{\sqrt{2(n-1)}} \;\xrightarrow{d}\; \mathcal{N}(0,1), \qquad (n\to\infty)   \tag{4}.
+\]
+
+Next the numerator and denominator is multiplied by \(\sigma^2\): \[
+\frac{n\widehat\sigma^2-(n-1)\sigma^2}{\sigma^2\sqrt{2(n-1)}} \xrightarrow{d} \mathcal{N}(0,1) \tag{5}.
+\]
+
+Then the numerator can be rewritten as
+\(\mathcal{N}(\widehat\sigma^2-\sigma^2)+\sigma^2\) and fraction can be
+split into 2 terms: \[
+\frac{\mathcal{N}(\widehat\sigma^2-\sigma^2)}{\sigma^2\sqrt{2(n-1)}} + \frac{1}{\sqrt{2(n-1)}} \xrightarrow{d} \mathcal{N}(0,1) \tag{6}.
+\] Since \(\dfrac{1}{\sqrt{2(n-1)}}\to 0\) as \(n\to\infty\), therefore
+\[
+\frac{\mathcal{N}(\widehat\sigma^2-\sigma^2)}{\sigma^2\sqrt{2(n-1)}} \xrightarrow{d} \mathcal{N}(0,1) \tag{7}.
+\]
+
+Let \(A_n=\sqrt{n}(\widehat\sigma^2-\sigma^2)\). Therefore, \[
+\frac{\sqrt{n}\,A_n}{\sigma^2\sqrt{2(n-1)}} \xrightarrow{d} \mathcal{N}(0,1) \tag{8}.
+\] Hence
+\(A_n \xrightarrow{d} N\!\left(0,\frac{\sigma^4 2(n-1)}{n}\right)\), and
+letting \(n\to\infty\) leads to \[
+\sqrt{n}(\widehat\sigma^2-\sigma^2)\xrightarrow{d} \mathcal{N}(0,2\sigma^4) \tag{9}.
+\]
+
+\subsubsection{\texorpdfstring{1.4 Using Delta method to obtain
+\(\sqrt{n}(\widehat\sigma-\sigma)\)}{1.4 Using Delta method to obtain \textbackslash sqrt\{n\}(\textbackslash widehat\textbackslash sigma-\textbackslash sigma)}}\label{using-delta-method-to-obtain-sqrtnwidehatsigma-sigma}
+
+Let \(h(x)=\sqrt{x}\), so \(h'(\sigma^2)=1/(2\sigma)\). Then by Taylor
+expansion, \[ 
+\widehat\sigma-\sigma \approx h'(\sigma^2),(\widehat\sigma^2-\sigma^2)=1/(2\sigma)(\widehat\sigma^2-\sigma^2).
+\] By multiplying by \(\sqrt{n}\) : \[ 
+\sqrt{n}(\widehat\sigma-\sigma) \approx \frac{\sqrt{n}}{2\sigma}(\widehat\sigma^2-\sigma^2) 
+\]
+
+Using (9): \[
+\sqrt{n}(\widehat\sigma-\sigma)\xrightarrow{d} N\!\Big(0,\Big(\frac{1}{2\sigma}\Big)^2\cdot 2\sigma^4\Big)=N\!\Big(0,\frac{\sigma^2}{2}\Big).
+\]
+
+\subsubsection{1.5 Combining results so
+far}\label{combining-results-so-far}
+
+\[
+\sqrt{n}\begin{pmatrix}\widehat\mu-\mu\\[4pt]\widehat\sigma-\sigma\end{pmatrix}
+\xrightarrow{d} N\!\Big(0,\ \Sigma\Big)  \qquad\text{where}\qquad
+\Sigma=\begin{pmatrix}\sigma^2 & 0\\[6pt]0 & \sigma^2/2\end{pmatrix}.
+\]
+
+\subsubsection{1.6 Using multivariate delta
+method}\label{using-multivariate-delta-method}
+
+Let \(g(\mu,\sigma)=\sqrt{q}\,\mu/\sigma = SR\) . Then the Taylor
+expansion leads to \[
+\sqrt{n}\big(g(\widehat\mu,\widehat\sigma)-g(\mu,\sigma)\big)
+= \nabla g(\mu,\sigma)^\top \sqrt{n}\begin{pmatrix}\widehat\mu-\mu\\[4pt]\widehat\sigma-\sigma\end{pmatrix} + o_p(1).
+\] Thus by the Central Limit Theorem, \[
+\sqrt{n}(\widehat{SR}-SR)\xrightarrow{d} N\!\Big(0,\nabla g^\top\Sigma\nabla g\Big).
+\]
+
+\subsubsection{1.7 Calculating the gradient and
+variance}\label{calculating-the-gradient-and-variance}
+
+Partial derivatives: \[
+\frac{\partial g}{\partial\mu}=\frac{\sqrt{q}}{\sigma} \qquad \text{and} \qquad
+\frac{\partial g}{\partial\sigma}=-\frac{SR}{\sigma},
+\] so \(\nabla g=(\sqrt{q}/\sigma,\ -SR/\sigma)^\top\). Then \[
+V=\nabla g^\top\Sigma\nabla g
+= \Big(\frac{\sqrt{q}}{\sigma}\Big)^2\sigma^2 + \Big(\frac{SR}{\sigma}\Big)^2\frac{\sigma^2}{2}
+= q + \frac{SR^2}{2}.
+\] Hence, \[
+\sqrt{n}(\widehat{SR}-SR)\xrightarrow{d} N\!\Big(0,\; q+\frac{SR^2}{2}\Big).
+\]
+
+\subsubsection{1.8 Converting to variance per
+year}\label{converting-to-variance-per-year}
+
+Therefore,\[
+\operatorname{Var}(\widehat{SR})\approx\frac{q+\tfrac{SR^2}{2}}{n}.
+\] By dividing numerator and denominator by \(q\): \[
+\frac{q+\tfrac{SR^2}{2}}{n}=\frac{1+\tfrac{SR^2}{2q}}{\,n/q\,}= \frac{1+\tfrac{SR^2}{2q}}{y}.
+\] Since \(n/q=y\). Thus the final result is \[
+\widehat{SR}\xrightarrow{d} N\!\Big(SR,\ \frac{1+\tfrac{SR^2}{2q}}{y}\Big).
+\]
+
+\subsection{Question 2 : The Maximum of the
+Sample}\label{question-2-the-maximum-of-the-sample}
+
+The proof below is based on Appendix: Proof of proposition 1 in (D. H.
+Bailey and López de Prado 2014). Foundations for this proof and
+normalisation constants \((a_N,b_N)\) were based on (Embrechts,
+Klüppelberg, and Mikosch 1997) (pp.138--147) and Proposition 2.1(iii) in
+(Resnick 2008).
+
+\subsubsection{Proof}\label{proof}
+
+\subsubsection{Definitions}\label{definitions}
+
+\begin{itemize}
+\item
+  Let \(X_1,\dots,X_N\) be IID \(\mathcal{N}(0,1)\).
+\item
+  Define the sample maximum \(M_N := \max_{1\le n\le N} X_n.\)
+\item
+  Let \(Z(x)=\Phi(x)\) be the standard normal CDF,
+\item
+  \(\varphi(x)\) to be its PDF, and \(Z^{-1}\) the inverse CDF .
+\item
+  Let \(\gamma= 0.5772156649...\) denote the Euler--Mascheroni constant.
+\end{itemize}
+
+\subsubsection{2.1 Fisher--Tippett--Gnedenko theorem (Fisher and Tippett
+1928)}\label{fishertippettgnedenko-theorem-fisher1928}
+
+The Fisher--Tippett--Gnedenko theorem states that for IID samples there
+exists normalising sequences \(a_N>0\) and \(b_N\in\mathbb{R}\) such
+that the normalised maximum converges in distribution to a
+non-degenerate limit which is one of three types (Gumbel, Fréchet,
+Weibull). This is determined by the tail of the underlying distribution.
+
+Because the normal distribution has exponentially decaying tails, it
+lies in the Gumbel domain . Hence there exist sequences \(a_N>0\) and
+\(b_N\in\mathbb{R}\) such that \[
+\frac{M_N - b_N}{a_N} \xrightarrow{d} G \tag{1},
+\] where \(G(x)=\exp(-e^{-x})\) is the standard Gumbel CDF.
+
+\subsubsection{\texorpdfstring{2.2 Normalising constant (centering):
+\(b_N\)}{2.2 Normalising constant (centering): b\_N}}\label{normalising-constant-centering-b_n}
+
+A standard centering is the \((1-1/N)\) quantile.
+
+Define \[
+b_N := Z^{-1}\!\Big(1-\frac{1}{N}\Big) \tag{2}.
+\] Therefore, by construction\[
+1 - Z(b_N) = \frac{1}{N} \tag{3}.
+\] This suggests in \(N\) samples, the maximum generally lies near this
+quantile.
+
+\subsubsection{\texorpdfstring{2.3 Normalising constant (scaling factor)
+:
+\(a_N\)}{2.3 Normalising constant (scaling factor) : a\_N}}\label{normalising-constant-scaling-factor-a_n}
+
+Define \(a_N\) to the difference between the \((1-1/(Ne))\) and the
+\((1-1/N)\) quantiles. Therefore,\[
+a_N := Z^{-1}\!\Big(1-\frac{1}{Ne}\Big) - Z^{-1}\!\Big(1-\frac{1}{N}\Big) \tag{4}.
+\] This choice enforces \[
+1 - Z(b_N + a_N) = \frac{1}{Ne}.
+\] Hence, for a fixed \(x\) such that \(x \in \mathbb{R}\) ,the tail at
+\(b_N + a_N x\) will be approximately \(\dfrac{1}{N}e^{-x}\).
+
+This leads to the Gumbel limit: \[
+Z(b_N + a_N x)^N \longrightarrow \exp(-e^{-x}) \tag{5}.
+\]
+
+\subsubsection{2.4 Convergence of the normalized maximum and
+expectation}\label{convergence-of-the-normalized-maximum-and-expectation}
+
+From 2.3 and the Fisher--Tippett--Gnedenko theorem we obtain \[
+\frac{M_N - b_N}{a_N} \xrightarrow{d} G.
+\]Results for the Gumbel domain (see (Resnick 2008) Prop. 2.1(iii))
+imply convergence of expectations under the integrability conditions
+satisfied here: \[
+\lim_{N\to\infty} \mathbb{E}\!\Big[\frac{M_N - b_N}{a_N}\Big] = \mathbb{E}[G]=\gamma \tag{6}.
+\] Hence for large \(N\), \[
+\mathbb{E}[M_N] \approx b_N + \gamma\,a_N \tag{7}.
+\]
+
+\subsubsection{2.5 Final substitution}\label{final-substitution}
+
+Substituting the definitions of \(b_N\) and \(a_N\) into
+\(\mathbb{E}[M_N]\approx b_N+\gamma a_N\) results in the following
+approximation: \[
+\mathbb{E}[M_N] \approx Z^{-1}\!\Big(1-\frac{1}{N}\Big)
+\;+\;\gamma\Big(Z^{-1}\!\Big(1-\frac{1}{Ne}\Big)-Z^{-1}\!\Big(1-\frac{1}{N}\Big)\Big).
+\]
+
+Distributing \(\gamma\) over the parentheses,
+
+\[
+\mathbb{E}[M_N] \approx Z^{-1}\!\Big(1-\frac{1}{N}\Big)
+\;+\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{Ne}\Big)
+\;-\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{N}\Big).
+\]
+
+Collecting the two terms that multiply
+\(Z^{-1}\big(1-\tfrac{1}{N}\big)\) leads to the final result,
+
+\[
+\mathbb{E}[M_N] \approx \big[1 - \gamma\big]\,Z^{-1}\!\Big(1-\frac{1}{N}\Big)
+\;+\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{Ne}\Big),
+\]
+
+for some constant \(\gamma\) (Euler--Mascheroni constant)
+
+\subsection{Question 3 : Minimum Backtest
+Length}\label{question-3-minimum-backtest-length}
+
+The proof below is based on Theorem 2 in (D. H. Bailey and López de
+Prado 2014). Furthermore the proof uses results from the asymptotic
+distribution of Sharpe ratio estimators (see Question 1) and the theory
+of Normal maxima (see Question 2).
+
+\subsubsection{3.1 Assumptions and initial
+setup}\label{assumptions-and-initial-setup}
+
+Using the result from Question 1 (section 1.8), the asymptotic
+distribution of the estimated annualised Sharpe ratio is \[
+\widehat{SR}\xrightarrow{d} \mathcal{N}\!\Big(SR,\; \frac{1+\tfrac{SR^2}{2q}}{y}\Big),
+\] where \(q\) is returns per year, \(y\) the number of years and
+\(n=qy\), and \(SR\) denotes the true annualised Sharpe ratio.
+
+As we are testing \(N\) independent strategies, all with true Sharpe
+ratio\(SR = 0\) (out-of-sample Sharpe ratio= 0). Therefore, we
+substitute \(SR=0\) into the mean and the variance:
+
+\begin{itemize}
+\tightlist
+\item
+  Mean: the asymptotic mean is \(SR\). Hence, \(SR=0\) so mean becomes
+  \(0\).
+\item
+  Variance: \[
+  \frac{1+\tfrac{SR^2}{2q}}{y}
+  \;\longrightarrow\;
+  \frac{1+\tfrac{0^2}{2q}}{y}
+  \;=\; \frac{1}{y}.
+  \]
+\end{itemize}
+
+Therefore, when the true Sharpe ratio is zero, \[
+\;\widehat{SR}\xrightarrow{d} \mathcal{N}\!\Big(0,\; \frac{1}{y}\Big)\; .
+\]
+
+We can also write this as,\[
+\widehat{SR} \;=\; \frac{1}{\sqrt{y}}\,Z,\qquad\text{where} \qquad  Z\sim\mathcal{N}(0,1),
+\] which will be used to derive the minimum backtest length.
+
+\subsubsection{\texorpdfstring{3.2 Maximum across \(N\)
+strategies}{3.2 Maximum across N strategies}}\label{maximum-across-n-strategies}
+
+Suppose \(N\) independent strategies are tested.\\
+Let \(Z_1,\dots,Z_N \sim \mathcal{N}(0,1)\) be iid, and we can define
+the sample maximum
+
+\[
+M_N := \max_{1 \le i \le N} Z_i.
+\]
+
+Then the maximum observed Sharpe ratio is
+
+\[
+\widehat{SR}_{(N)} = \max_{i} \widehat{SR}_i = \frac{1}{\sqrt{y}}\,M_N. \tag{1}
+\]
+
+\subsubsection{3.3 Minimum backtest
+length}\label{minimum-backtest-length}
+
+Taking expectations in (1):
+
+\[
+\mathbb{E}[\widehat{SR}_{(N)}] = \frac{1}{\sqrt{y}}\,\mathbb{E}[M_N]. \tag{2}
+\]
+
+Even if the true Sharpe ratio is zero, selecting the strategy with the
+highest in-sample Sharpe ratio introduces a positve bias which means
+\(\mathbb{E}[\widehat{SR}_{(N)}] > 0\). Therefore, (2) can be rearranged
+to obtain an expression for \(y\) in terms of \(\mathbb{E}[M_N]\): \[
+y = \frac{(\mathbb{E}[M_N])^2}{\big(\mathbb{E}[\widehat{SR}_{(N)}]\big)^2}. \tag{3}
+\]
+
+Here, \(y\) is the backtest length. So by definition, the minimum
+backtest length \(T_{\min}\) is the value of \(y\) needed to ensure that
+the expected observed maximum Sharpe ratio
+\(\mathbb{E}[\widehat{SR}_{(N)}]\) does not exceed a target .
+
+Hence we can write:
+
+\[
+T_{\min} = y = \frac{(\mathbb{E}[M_N])^2}{(\mathbb{E}[\widehat{SR}_{(N)}])^2}.
+\]
+
+To control for the bias mentioned earlier, the minimum backtest length
+\(y\) needs to be long enough so that the expected maximum observed
+Sharpe ratio is no greater than a chosen threshold.
+
+From Question 2, we know that \(\mathbb{E}[M_N]\) grows with \(N\), and
+we derived an explicit approximation: \[
+\mathbb{E}[M_N] \;\approx\; \big[1 - \gamma\big]\,Z^{-1}\!\Big(1-\tfrac{1}{N}\Big)
++ \gamma\,Z^{-1}\!\Big(1-\tfrac{1}{Ne}\Big). \tag{4}
+\]
+
+Also from Question 2, the expected maximum of \(N\) i.i.d. standard
+Normals grows logarithmically for large \(N\). Therefore, \[
+\mathbb{E}[M_N]^2 \;\lesssim\; 2\ln N. \tag{5}
+\]
+
+\subsubsection{3.4 Final result}\label{final-result}
+
+Substituting (5) into (3) gives the bound:\[
+T_{\min} \;<\; \frac{2\ln(N)}{(\,\mathbb{E}[\mathbb{E}[\widehat{SR}_{(N)}]]\,)^2}=\frac{2\ln(N)}{(\,\mathbb{E}[\widehat{SR}_{(N)}]\,)^2}. \tag{6}
+\]
+
+where the denominator \((\mathbb{E}[\mathbb{E}[\widehat{SR}_{(N)}]])^2\)
+becomes \((\mathbb{ E}[\widehat{SR}_{(N)}])^2\) since the expectation of
+a constant is the constant.
+
+Finally, (6) gives the minimum number of years needed to avoid
+overfitting from selecting the maximum in-sample Sharpe ratio among
+\(N\) strategies.
+
+\subsubsection{3.5 Discussion}\label{discussion}
+
+As the number of strategies \(N\) increases, the minimum backtest length
+grows logarithmically with \(N\). This shows that the minimum backtest
+length grows as the analyst tries more independent configurations of the
+model so as to keep the Sharpe Ratio at a given level.
+
+\section{PART II : Backtest Performance of the Tangency
+Portfolio}\label{part-ii-backtest-performance-of-the-tangency-portfolio}
+
+\subsection{Experiment 1 : In-Sample and Out-Of-Sample Sharpe
+Ratios}\label{experiment-1-in-sample-and-out-of-sample-sharpe-ratios}
+
+\subsection{Experiment 2 : Out-Of-Sample Backtesting using a Rolling
+Window}\label{experiment-2-out-of-sample-backtesting-using-a-rolling-window}
+
+\newpage
+
+\section{References}\label{references}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-bailey_2014}
+Bailey, David H., and Marcos López de Prado. 2014. {``The Deflated
+Sharpe Ratio:correcting for Selection Bias, BacktestOverfitting, and
+Non-Normality.''} \emph{The Journal of Portfolio Management} 40
+(September): 94--107. \url{https://doi.org/10.3905/jpm.2014.40.5.094}.
+
+\bibitem[\citeproctext]{ref-bailey_2016}
+Bailey, David, Jonathan Borwein, Marcos López de Prado, and Qiji Jim
+Zhu. 2016. {``The Probability of Backtest Overfitting.''} \emph{The
+Journal of Computational Finance}, September.
+\url{https://doi.org/10.21314/jcf.2016.322}.
+
+\bibitem[\citeproctext]{ref-embrechts_1997}
+Embrechts, Paul, Claudia Klüppelberg, and Thomas Mikosch. 1997.
+\emph{Modelling Extremal Events for Insurance and Finance}. Springer.
+
+\bibitem[\citeproctext]{ref-fisher1928}
+Fisher, Ronald Aylmer, and Leonard Henry Caleb Tippett. 1928.
+\emph{Limiting Forms of the Frequency Distribution of the Largest or
+Smallest Member of a Sample}. Vol. 24. 2. Cambridge University Press.
+
+\bibitem[\citeproctext]{ref-gnedenko2006}
+Gnedenko, BV. 2006. \emph{On Limit Theorems for a Random Number of
+Random Variables}. Springer.
+
+\bibitem[\citeproctext]{ref-lee_2000}
+Lee, Wai. 2000. \emph{Theory and Methodology of Tactical Asset
+Allocation}. John Wiley \& Sons.
+
+\bibitem[\citeproctext]{ref-liu_2012}
+Liu, Ying, Marie Rekkas, and Augustine Wong. 2012. {``Inference for the
+Sharpe Ratio Using a Likelihood-Based Approach.''} \emph{Journal of
+Probability and Statistics} 2012: 1--24.
+\url{https://doi.org/10.1155/2012/878561}.
+
+\bibitem[\citeproctext]{ref-lo_2002}
+Lo, Andrew W. 2002. {``The Statistics of Sharpe Ratios.''}
+\emph{Financial Analysts Journal} 58 (July): 36--52.
+\url{https://doi.org/10.2469/faj.v58.n4.2453}.
+
+\bibitem[\citeproctext]{ref-resnick_2008}
+Resnick, Sidney I. 2008. \emph{Extreme Values, Regular Variation and
+Point Processes}. Springer, Cop.
+
+\end{CSLReferences}
+
+\newpage
+
+\section{Appendix A : Code}\label{appendix-a-code}
+
+\section{Appendix B : Session
+Information}\label{appendix-b-session-information}
+
+\end{document}
