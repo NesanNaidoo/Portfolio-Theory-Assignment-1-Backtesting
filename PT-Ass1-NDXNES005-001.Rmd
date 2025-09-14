@@ -3,32 +3,158 @@ title: "Portfolio Theory: Assignment 1"
 subtitle: "The Statistics of Strategy Back-Testing"
 author: "Nesan Naidoo : NDXNES005"
 date: "`r Sys.Date()`"
-output: pdf_document
-bibliography: Sources.bib
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true   # correct spelling with underscore
 fontsize: 12pt
+header-includes:
+  - \usepackage{setspace}
+  - \onehalfspacing
+  - \usepackage{etoolbox}
+  - \apptocmd{\thebibliography}{\setlength{\itemsep}{1.0\baselineskip}}{}{}
+  - \usepackage{amsmath}
+  - \usepackage{amssymb}
+  - \usepackage{float}
+  - \usepackage{graphicx}
+  - \usepackage{fvextra}
+  - \usepackage{adjustbox}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+execute:
+  warning: false
+  message: false
+nocite: '@*'
+bibliography: Sources.bib
 ---
 
 # Problem Specification
 
+This assignment examined the statistics of strategy backtesting within the context of portfolio theory. Part I focused on proving that the estimated annualized Sharpe ratio(SR) converges asymptotically to a normal distribution. Furthermore, part I motivated that for a sufficiently large number of samples, the mean of the sample maximum of standard normally distributed random variables can be approximated. Lastly, part I focused on the derivation and discussion of the minimum Backtest length.
+
+Part II focused on mean–variance backtesting of the tangency portfolio under full investment and no-short-selling constraints. Sharpe ratio–maximising portfolios are computed from rolling windows of the historical data. The historical dataset is divided into in-sample (IS) and out-of-sample (OOS) datasets. Two experiments are conducted: 1) compared IS and OOS Sharpe ratios and 2) evaluated OOS backtest performance using a rolling window approach.
+
 # Data Specification
+
+The Tactical Asset Allocation data is from PT-DATA-ALBI-JIBAR-JSEIND-Daily-1994-2017.xlsx
+
+1.  ICB Industrial Level Indices
+
+2.  ALBI (All Bond Index (ALBI) Total Return Index (TRI) Data)
+
+3.  Money Market Data: JIBAR and STEFI TRI
+
+4.  Various Indices: JSE Growth, JSE Value, JSE ALSI, JSE SRI
 
 # Configuration control
 
-#  PART I : Introduction to Strategy Backtesting
-##  Question 1 : Sample Error when Estimating the Sharpe Ratio
+Version control: managed with Git and GitHub.
 
-##  Question 2 : The Maximum of the Sample
+Packages: managed with `renv` for reproducibility.
+
+Project structure:
+
+Repository: [github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting](https://github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting)
+
+# PART I : Introduction to Strategy Backtesting
+
+## Question 1 : Sample Error when Estimating the Sharpe Ratio
+
+Proof below based on asymptotic distributions of Sharpe Ratio estimators [@lo_2002]
+
+### Assumptions
+
+We assume excess returns $r_t$ are IID normal, $r_t \sim N(\mu,\sigma^2).$ Let $q$ be the number of return periods per year. Let $y$ the number of years.\
+The total number of observations is $n = qy.$
+
+### Sample mean
+
+By the Central Limit Theorem, $$
+\sqrt{n}\,(\hat\mu - \mu) \;\;\xrightarrow{d}\;\; N(0,\sigma^2).
+$$ Therefore, $\operatorname{Var}(\hat\mu) \approx \sigma^2/n$.
+
+### Sample standard deviation
+
+For a normal sample, $$
+\sqrt{n}\,(\hat\sigma^2 - \sigma^2) \;\;\xrightarrow{d}\;\; N(0,2\sigma^4).
+$$ By applying the delta method with $h(x)=\sqrt{x}$ at $x=\sigma^2$: $$
+h'(x) = \tfrac{1}{2\sqrt{x}}, \quad h'(\sigma^2)=\tfrac{1}{2\sigma}.
+$$ Therefore, $$
+\sqrt{n}\,(\hat\sigma-\sigma) \;\;\xrightarrow{d}\;\; N\!\left(0, \tfrac{\sigma^2}{2}\right).
+$$ Hence $\operatorname{Var}(\hat\sigma) \approx \sigma^2/(2n)$.
+
+Furthermore, for normal data $\hat\mu$ and $\hat\sigma$ are asymptotically independent.
+
+### Sharpe ratio mapping
+
+The annualised Sharpe ratio is $SR = \sqrt{q}\,\frac{\mu}{\sigma}$ The estimated annualised Sharpe Ratio is $\qquad\hat{SR} = \sqrt{q}\,\frac{\hat\mu}{\hat\sigma}.$ Let $g(\mu,\sigma) = \sqrt{q}\,\mu/\sigma$ with gradient,
+
+$$
+\nabla g(\mu,\sigma) =
+\begin{pmatrix}
+\frac{\sqrt{q}}{\sigma} \\[6pt]
+-\frac{SR}{\sigma}
+\end{pmatrix}.
+$$
+
+The asymptotic covariance of $(\hat\mu,\hat\sigma)$ is $$
+\Sigma =
+\begin{pmatrix}
+\sigma^2 & 0 \\[6pt]
+0 & \sigma^2/2
+\end{pmatrix}.
+$$
+
+By the delta method,$\sqrt{n}\,(\hat{SR} - SR) \;\;\xrightarrow{d}\;\; N(0,V)$ where $V = \nabla g^\top \Sigma \nabla g.$
+
+Next, $$
+V = \left(\tfrac{\sqrt{q}}{\sigma}\right)^2 \sigma^2
++ \left(\tfrac{SR}{\sigma}\right)^2 \tfrac{\sigma^2}{2}
+= q + \tfrac{SR^2}{2}.
+$$
+
+### Asymptotic variance of $\hat{SR}$
+
+Therefore, $$
+\sqrt{n}\,(\hat{SR}-SR) \;\;\xrightarrow{d}\;\; N\!\big(0,\; q + \tfrac{SR^2}{2}\big).
+$$
+
+Hence, $$
+\operatorname{Var}(\hat{SR})
+\;\approx\; \frac{q+\tfrac{SR^2}{2}}{n}.
+$$
+
+Substituting $n= qy$: $$
+\operatorname{Var}(\hat{SR})
+\;\approx\; \frac{q+\tfrac{SR^2}{2}}{q\,y}
+\;=\; \frac{1+\tfrac{SR^2}{2q}}{y}.
+$$
+
+Therefore the asymptotic distribution is $$
+\hat{SR} \;\sim\; N\!\Big( SR,\; \frac{1+\tfrac{SR^2}{2q}}{y} \Big).
+$$
+
+## Question 2 : The Maximum of the Sample
+
+Proof below based on [@bailey_2014] (See Appendix: Proof of proposition 1) ,[@embrechts_1997] (pp.138–147) and [@resnick_2008] (see Proposition 2.1(iii))
 
 ## Question 3 : Minimum Backtest Length
 
 # PART II : Backtest Performance of the Tangency Portfolio
+
 ## Experiment 1 : In-Sample and Out-Of-Sample Sharpe Ratios
 
-
 ## Experiment 2 : Out-Of-Sample Backtesting using a Rolling Window
+
+\newpage
+
+# References
+
+::: {#refs}
+:::
+
+\newpage
 
 # Appendix A : Code
 
 # Appendix B : Session Information
-
-# References
