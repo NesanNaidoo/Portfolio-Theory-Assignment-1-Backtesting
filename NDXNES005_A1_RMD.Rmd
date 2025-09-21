@@ -600,7 +600,7 @@ p.long <- summary_df |>
       Metric == "var" ~ "Variance",TRUE ~ Metric
     ))
 
-# Mean and Variance In-Sample vs Out-of-Sample Mean & Variance
+# Mean and Variance of portfolio In-Sample vs Out-of-Sample 
 p1<- p.long |>
   filter(Metric %in% c("Mean", "Variance")) |>
   ggplot(aes(x = Date, y = Value, color = Metric, linetype = Type)) +
@@ -613,7 +613,7 @@ p1<- p.long |>
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Sharpe Ratios In-Sample vs Out-of-Sample Sharpe Ratios
+# Sharpe Ratios of portfolios In-Sample vs Out-of-Sample 
 p2 <- p.long |>
   filter(Metric == "SR") |>
   ggplot(aes(x = Date, y = Value, color = Type, linetype = Type)) +
