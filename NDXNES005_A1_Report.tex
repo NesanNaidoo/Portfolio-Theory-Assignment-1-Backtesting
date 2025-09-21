@@ -121,25 +121,24 @@
 \makeatother
 \subtitle{The Statistics of Strategy Back-Testing}
 \author{Nesan Naidoo : NDXNES005}
-\date{2025-09-15}
+\date{2025-09-21}
 
 \begin{document}
 \maketitle
 
 \section{Problem Specification}\label{problem-specification}
 
-This assignment examined the statistics of strategy backtesting within
-the context of portfolio theory. Part I focused on proving that the
-estimated annualized Sharpe ratio(SR) converges asymptotically to a
-normal distribution. Furthermore, part I motivated that for a
-sufficiently large number of samples, the mean of the sample maximum of
-standard normally distributed random variables can be approximated.
-Lastly, part I focused on the derivation and discussion of the minimum
-backtest length.
+This assignment investigated the statistics of strategy backtesting.
+Part I focused on proving that the estimated annualized Sharpe ratio(SR)
+converges asymptotically to a normal distribution. Furthermore, part I
+motivated that for a sufficiently large number of samples, the mean of
+the sample maximum of standard normally distributed random variables can
+be approximated. Lastly, part I focused on the derivation and discussion
+of the minimum backtest length.
 
 Part II focused on mean--variance backtesting of the tangency portfolio
 under full investment and no-short-selling constraints. Sharpe
-ratio--maximising portfolios are computed from rolling windows of the
+ratio--maximising portfolios were calculated from rolling windows of the
 historical data. The historical dataset is divided into in-sample (IS)
 and out-of-sample (OOS) datasets. Two experiments are conducted: 1)
 compared IS and OOS Sharpe ratios and 2) evaluated OOS backtest
@@ -147,29 +146,37 @@ performance using a rolling window approach.
 
 \section{Data Specification}\label{data-specification}
 
-The Tactical Asset Allocation data is from
-PT-DATA-ALBI-JIBAR-JSEIND-Daily-1994-2017.xlsx
+The Tactical Asset Allocation data is loaded from
+``PT-DATA-ALBI-JIBAR-JSEIND-Daily-1994-2017.xlsx'' with the following
+asset information: \textbackslash{} Key: (Number of rows, number of
+columns) 1. Sheet 1: (8439,2) ALBI (All Bond Index (ALBI) Total Return
+Index (TRI) Data
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
 \item
-  ICB Industrial Level Indices
+  Sheet 2: (8405,4) Money Market Data: JIBAR and STEFI TRI
 \item
-  ALBI (All Bond Index (ALBI) Total Return Index (TRI) Data)
+  Sheet 3: (8439,28) JSE ICB Industrial Level Indices
 \item
-  Money Market Data: JIBAR and STEFI TRI
-\item
-  Various Indices: JSE Growth, JSE Value, JSE ALSI, JSE SRI
+  Sheet 4: (8439,20) JSE Various Indices: JSE Growth, JSE Value, JSE
+  ALSI, JSE SRI
 \end{enumerate}
 
 \section{Configuration control}\label{configuration-control}
 
+Coding for Part II's Experiment 1 and 2 was completed using RStudio
+2024.09.0+375 (``Cranberry Hibiscus'' Release) and was based on R and
+MATLAB code provided by Professor Tim Gebbie(STA4028Z).
+
 Version control: managed with Git and GitHub.
 
-Project structure:
+To view repository, click on link:
+\href{https://github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting}{PT-Assignment
+1}
 
-Click on link to repository:
-\href{https://github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting}{github.com/NesanNaidoo/Portfolio-Theory-Assignment-1-Backtesting}
+\newpage
 
 \section{PART I : Introduction to Strategy
 Backtesting}\label{part-i-introduction-to-strategy-backtesting}
@@ -178,7 +185,7 @@ Backtesting}\label{part-i-introduction-to-strategy-backtesting}
 Ratio}\label{question-1-sample-error-when-estimating-the-sharpe-ratio}
 
 Proof below is based on the asymptotic distributions of Sharpe Ratio
-estimators (See Appendix A. IID Returns in (Lo 2002) )
+estimators (See Appendix A. IID Returns in (Lo, 2002) )
 
 \subsubsection{1.1 Assumptions}\label{assumptions}
 
@@ -265,13 +272,13 @@ letting \(n\to\infty\) leads to \[
 
 Let \(h(x)=\sqrt{x}\), so \(h'(\sigma^2)=1/(2\sigma)\). Then by Taylor
 expansion, \[ 
-\widehat\sigma-\sigma \approx h'(\sigma^2),(\widehat\sigma^2-\sigma^2)=1/(2\sigma)(\widehat\sigma^2-\sigma^2).
+\widehat\sigma-\sigma \approx h'(\sigma^2),(\widehat\sigma^2-\sigma^2)=1/(2\sigma)(\widehat\sigma^2-\sigma^2) \tag{10}.
 \] By multiplying by \(\sqrt{n}\) : \[ 
-\sqrt{n}(\widehat\sigma-\sigma) \approx \frac{\sqrt{n}}{2\sigma}(\widehat\sigma^2-\sigma^2) 
+\sqrt{n}(\widehat\sigma-\sigma) \approx \frac{\sqrt{n}}{2\sigma}(\widehat\sigma^2-\sigma^2) \tag{11} 
 \]
 
 Using (9): \[
-\sqrt{n}(\widehat\sigma-\sigma)\xrightarrow{d} N\!\Big(0,\Big(\frac{1}{2\sigma}\Big)^2\cdot 2\sigma^4\Big)=N\!\Big(0,\frac{\sigma^2}{2}\Big).
+\sqrt{n}(\widehat\sigma-\sigma)\xrightarrow{d} N\!\Big(0,\Big(\frac{1}{2\sigma}\Big)^2\cdot 2\sigma^4\Big)=N\!\Big(0,\frac{\sigma^2}{2}\Big) \tag{12}.
 \]
 
 \subsubsection{1.5 Combining results so
@@ -289,9 +296,9 @@ method}\label{using-multivariate-delta-method}
 Let \(g(\mu,\sigma)=\sqrt{q}\,\mu/\sigma = SR\) . Then the Taylor
 expansion leads to \[
 \sqrt{n}\big(g(\widehat\mu,\widehat\sigma)-g(\mu,\sigma)\big)
-= \nabla g(\mu,\sigma)^\top \sqrt{n}\begin{pmatrix}\widehat\mu-\mu\\[4pt]\widehat\sigma-\sigma\end{pmatrix} + o_p(1).
+= \nabla g(\mu,\sigma)^\top \sqrt{n}\begin{pmatrix}\widehat\mu-\mu\\[4pt]\widehat\sigma-\sigma\end{pmatrix} + o_p(1) \tag{13}.
 \] Thus by the Central Limit Theorem, \[
-\sqrt{n}(\widehat{SR}-SR)\xrightarrow{d} N\!\Big(0,\nabla g^\top\Sigma\nabla g\Big).
+\sqrt{n}(\widehat{SR}-SR)\xrightarrow{d} N\!\Big(0,\nabla g^\top\Sigma\nabla g\Big) \tag{14}.
 \]
 
 \subsubsection{1.7 Calculating the gradient and
@@ -303,7 +310,7 @@ Partial derivatives: \[
 \] so \(\nabla g=(\sqrt{q}/\sigma,\ -SR/\sigma)^\top\). Then \[
 V=\nabla g^\top\Sigma\nabla g
 = \Big(\frac{\sqrt{q}}{\sigma}\Big)^2\sigma^2 + \Big(\frac{SR}{\sigma}\Big)^2\frac{\sigma^2}{2}
-= q + \frac{SR^2}{2}.
+= q + \frac{SR^2}{2} \tag{15}.
 \] Hence, \[
 \sqrt{n}(\widehat{SR}-SR)\xrightarrow{d} N\!\Big(0,\; q+\frac{SR^2}{2}\Big).
 \]
@@ -312,23 +319,22 @@ V=\nabla g^\top\Sigma\nabla g
 year}\label{converting-to-variance-per-year}
 
 Therefore,\[
-\operatorname{Var}(\widehat{SR})\approx\frac{q+\tfrac{SR^2}{2}}{n}.
+\operatorname{Var}(\widehat{SR})\approx\frac{q+\tfrac{SR^2}{2}}{n} \tag{16}.
 \] By dividing numerator and denominator by \(q\): \[
-\frac{q+\tfrac{SR^2}{2}}{n}=\frac{1+\tfrac{SR^2}{2q}}{\,n/q\,}= \frac{1+\tfrac{SR^2}{2q}}{y}.
+\frac{q+\tfrac{SR^2}{2}}{n}=\frac{1+\tfrac{SR^2}{2q}}{\,n/q\,}= \frac{1+\tfrac{SR^2}{2q}}{y} \tag{17}.
 \] Since \(n/q=y\). Thus the final result is \[
-\widehat{SR}\xrightarrow{d} N\!\Big(SR,\ \frac{1+\tfrac{SR^2}{2q}}{y}\Big).
+\widehat{SR}\xrightarrow{d} N\!\Big(SR,\ \frac{1+\tfrac{SR^2}{2q}}{y}\Big) \tag{18}.
 \]
+
+\newpage
 
 \subsection{Question 2 : The Maximum of the
 Sample}\label{question-2-the-maximum-of-the-sample}
 
-The proof below is based on Appendix: Proof of proposition 1 in (D. H.
-Bailey and López de Prado 2014). Foundations for this proof and
-normalisation constants \((a_N,b_N)\) were based on (Embrechts,
-Klüppelberg, and Mikosch 1997) (pp.138--147) and Proposition 2.1(iii) in
-(Resnick 2008).
-
-\subsubsection{Proof}\label{proof}
+The proof below is based on Appendix: Proof of proposition 1 in (Bailey
+\& López de Prado, 2014). Foundations for this proof and normalisation
+constants \((a_N,b_N)\) were based on (Embrechts et al., 1997)
+(pp.138--147) and Proposition 2.1(iii) in (Resnick, 2008).
 
 \subsubsection{Definitions}\label{definitions}
 
@@ -345,7 +351,7 @@ Klüppelberg, and Mikosch 1997) (pp.138--147) and Proposition 2.1(iii) in
   Let \(\gamma= 0.5772156649...\) denote the Euler--Mascheroni constant.
 \end{itemize}
 
-\subsubsection{2.1 Fisher--Tippett--Gnedenko theorem (Fisher and Tippett
+\subsubsection{2.1 Fisher--Tippett--Gnedenko theorem (Fisher \& Tippett,
 1928)}\label{fishertippettgnedenko-theorem-fisher1928}
 
 The Fisher--Tippett--Gnedenko theorem states that for IID samples there
@@ -393,7 +399,7 @@ expectation}\label{convergence-of-the-normalized-maximum-and-expectation}
 
 From 2.3 and the Fisher--Tippett--Gnedenko theorem we obtain \[
 \frac{M_N - b_N}{a_N} \xrightarrow{d} G.
-\]Results for the Gumbel domain (see (Resnick 2008) Prop. 2.1(iii))
+\]Results for the Gumbel domain (see (Resnick, 2008) Prop. 2.1(iii))
 imply convergence of expectations under the integrability conditions
 satisfied here: \[
 \lim_{N\to\infty} \mathbb{E}\!\Big[\frac{M_N - b_N}{a_N}\Big] = \mathbb{E}[G]=\gamma \tag{6}.
@@ -407,7 +413,7 @@ Substituting the definitions of \(b_N\) and \(a_N\) into
 \(\mathbb{E}[M_N]\approx b_N+\gamma a_N\) results in the following
 approximation: \[
 \mathbb{E}[M_N] \approx Z^{-1}\!\Big(1-\frac{1}{N}\Big)
-\;+\;\gamma\Big(Z^{-1}\!\Big(1-\frac{1}{Ne}\Big)-Z^{-1}\!\Big(1-\frac{1}{N}\Big)\Big).
+\;+\;\gamma\Big(Z^{-1}\!\Big(1-\frac{1}{Ne}\Big)-Z^{-1}\!\Big(1-\frac{1}{N}\Big)\Big) \tag{8}.
 \]
 
 Distributing \(\gamma\) over the parentheses,
@@ -415,7 +421,7 @@ Distributing \(\gamma\) over the parentheses,
 \[
 \mathbb{E}[M_N] \approx Z^{-1}\!\Big(1-\frac{1}{N}\Big)
 \;+\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{Ne}\Big)
-\;-\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{N}\Big).
+\;-\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{N}\Big) \tag{9}.
 \]
 
 Collecting the two terms that multiply
@@ -423,16 +429,18 @@ Collecting the two terms that multiply
 
 \[
 \mathbb{E}[M_N] \approx \big[1 - \gamma\big]\,Z^{-1}\!\Big(1-\frac{1}{N}\Big)
-\;+\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{Ne}\Big),
+\;+\;\gamma\,Z^{-1}\!\Big(1-\frac{1}{Ne}\Big) \tag{10},
 \]
 
 for some constant \(\gamma\) (Euler--Mascheroni constant)
 
+\newpage
+
 \subsection{Question 3 : Minimum Backtest
 Length}\label{question-3-minimum-backtest-length}
 
-The proof below is based on Theorem 2 in (D. H. Bailey and López de
-Prado 2014). Furthermore the proof uses results from the asymptotic
+The proof below is based on Theorem 2 in (Bailey \& López de Prado,
+2014). Furthermore the proof uses results from the asymptotic
 distribution of Sharpe ratio estimators (see Question 1) and the theory
 of Normal maxima (see Question 2).
 
@@ -464,11 +472,11 @@ substitute \(SR=0\) into the mean and the variance:
 \end{itemize}
 
 Therefore, when the true Sharpe ratio is zero, \[
-\;\widehat{SR}\xrightarrow{d} \mathcal{N}\!\Big(0,\; \frac{1}{y}\Big)\; .
+\;\widehat{SR}\xrightarrow{d} \mathcal{N}\!\Big(0,\; \frac{1}{y}\Big)\ \tag{1}; .
 \]
 
 We can also write this as,\[
-\widehat{SR} \;=\; \frac{1}{\sqrt{y}}\,Z,\qquad\text{where} \qquad  Z\sim\mathcal{N}(0,1),
+\widehat{SR} \;=\; \frac{1}{\sqrt{y}}\,Z,\qquad\text{where} \qquad  Z\sim\mathcal{N}(0,1) \tag{2},
 \] which will be used to derive the minimum backtest length.
 
 \subsubsection{\texorpdfstring{3.2 Maximum across \(N\)
@@ -485,7 +493,7 @@ M_N := \max_{1 \le i \le N} Z_i.
 Then the maximum observed Sharpe ratio is
 
 \[
-\widehat{SR}_{(N)} = \max_{i} \widehat{SR}_i = \frac{1}{\sqrt{y}}\,M_N. \tag{1}
+\widehat{SR}_{(N)} = \max_{i} \widehat{SR}_i = \frac{1}{\sqrt{y}}\,M_N. \tag{3}
 \]
 
 \subsubsection{3.3 Minimum backtest
@@ -494,14 +502,14 @@ length}\label{minimum-backtest-length}
 Taking expectations in (1):
 
 \[
-\mathbb{E}[\widehat{SR}_{(N)}] = \frac{1}{\sqrt{y}}\,\mathbb{E}[M_N]. \tag{2}
+\mathbb{E}[\widehat{SR}_{(N)}] = \frac{1}{\sqrt{y}}\,\mathbb{E}[M_N]. \tag{4}
 \]
 
 Even if the true Sharpe ratio is zero, selecting the strategy with the
 highest in-sample Sharpe ratio introduces a positve bias which means
 \(\mathbb{E}[\widehat{SR}_{(N)}] > 0\). Therefore, (2) can be rearranged
 to obtain an expression for \(y\) in terms of \(\mathbb{E}[M_N]\): \[
-y = \frac{(\mathbb{E}[M_N])^2}{\big(\mathbb{E}[\widehat{SR}_{(N)}]\big)^2}. \tag{3}
+y = \frac{(\mathbb{E}[M_N])^2}{\big(\mathbb{E}[\widehat{SR}_{(N)}]\big)^2}. \tag{5}
 \]
 
 Here, \(y\) is the backtest length. So by definition, the minimum
@@ -512,7 +520,7 @@ the expected observed maximum Sharpe ratio
 Hence we can write:
 
 \[
-T_{\min} = y = \frac{(\mathbb{E}[M_N])^2}{(\mathbb{E}[\widehat{SR}_{(N)}])^2}.
+T_{\min} = y = \frac{(\mathbb{E}[M_N])^2}{(\mathbb{E}[\widehat{SR}_{(N)}])^2} \tag{6}.
 \]
 
 To control for the bias mentioned earlier, the minimum backtest length
@@ -522,18 +530,18 @@ Sharpe ratio is no greater than a chosen threshold.
 From Question 2, we know that \(\mathbb{E}[M_N]\) grows with \(N\), and
 we derived an explicit approximation: \[
 \mathbb{E}[M_N] \;\approx\; \big[1 - \gamma\big]\,Z^{-1}\!\Big(1-\tfrac{1}{N}\Big)
-+ \gamma\,Z^{-1}\!\Big(1-\tfrac{1}{Ne}\Big). \tag{4}
++ \gamma\,Z^{-1}\!\Big(1-\tfrac{1}{Ne}\Big). \tag{7}
 \]
 
 Also from Question 2, the expected maximum of \(N\) i.i.d. standard
 Normals grows logarithmically for large \(N\). Therefore, \[
-\mathbb{E}[M_N]^2 \;\lesssim\; 2\ln N. \tag{5}
+\mathbb{E}[M_N]^2 \;\lesssim\; 2\ln N. \tag{8}
 \]
 
 \subsubsection{3.4 Final result}\label{final-result}
 
-Substituting (5) into (3) gives the bound:\[
-T_{\min} \;<\; \frac{2\ln(N)}{(\,\mathbb{E}[\mathbb{E}[\widehat{SR}_{(N)}]]\,)^2}=\frac{2\ln(N)}{(\,\mathbb{E}[\widehat{SR}_{(N)}]\,)^2}. \tag{6}
+Based on (6) and (8), we can deduce the bound:\[
+T_{\min} \;<\; \frac{2\ln(N)}{(\,\mathbb{E}[\mathbb{E}[\widehat{SR}_{(N)}]]\,)^2}=\frac{2\ln(N)}{(\,\mathbb{E}[\widehat{SR}_{(N)}]\,)^2}. \tag{9}
 \]
 
 where the denominator \((\mathbb{E}[\mathbb{E}[\widehat{SR}_{(N)}]])^2\)
@@ -551,72 +559,34 @@ grows logarithmically with \(N\). This shows that the minimum backtest
 length grows as the analyst tries more independent configurations of the
 model so as to keep the Sharpe Ratio at a given level.
 
-\section{PART II : Backtest Performance of the Tangency
-Portfolio}\label{part-ii-backtest-performance-of-the-tangency-portfolio}
-
-\subsection{Experiment 1 : In-Sample and Out-Of-Sample Sharpe
-Ratios}\label{experiment-1-in-sample-and-out-of-sample-sharpe-ratios}
-
-\subsection{Experiment 2 : Out-Of-Sample Backtesting using a Rolling
-Window}\label{experiment-2-out-of-sample-backtesting-using-a-rolling-window}
-
 \newpage
-
-\section{References}\label{references}
 
 \phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
 \bibitem[\citeproctext]{ref-bailey_2014}
-Bailey, David H., and Marcos López de Prado. 2014. {``The Deflated
-Sharpe Ratio:correcting for Selection Bias, BacktestOverfitting, and
-Non-Normality.''} \emph{The Journal of Portfolio Management} 40
-(September): 94--107. \url{https://doi.org/10.3905/jpm.2014.40.5.094}.
-
-\bibitem[\citeproctext]{ref-bailey_2016}
-Bailey, David, Jonathan Borwein, Marcos López de Prado, and Qiji Jim
-Zhu. 2016. {``The Probability of Backtest Overfitting.''} \emph{The
-Journal of Computational Finance}, September.
-\url{https://doi.org/10.21314/jcf.2016.322}.
+Bailey, D. H., \& López de Prado, M. (2014). The deflated sharpe
+ratio:correcting for selection bias, BacktestOverfitting, and
+non-normality. \emph{The Journal of Portfolio Management}, \emph{40},
+94--107. \url{https://doi.org/10.3905/jpm.2014.40.5.094}
 
 \bibitem[\citeproctext]{ref-embrechts_1997}
-Embrechts, Paul, Claudia Klüppelberg, and Thomas Mikosch. 1997.
-\emph{Modelling Extremal Events for Insurance and Finance}. Springer.
+Embrechts, P., Klüppelberg, C., \& Mikosch, T. (1997). \emph{Modelling
+extremal events for insurance and finance}. Springer.
 
 \bibitem[\citeproctext]{ref-fisher1928}
-Fisher, Ronald Aylmer, and Leonard Henry Caleb Tippett. 1928.
-\emph{Limiting Forms of the Frequency Distribution of the Largest or
-Smallest Member of a Sample}. Vol. 24. 2. Cambridge University Press.
-
-\bibitem[\citeproctext]{ref-gnedenko2006}
-Gnedenko, BV. 2006. \emph{On Limit Theorems for a Random Number of
-Random Variables}. Springer.
-
-\bibitem[\citeproctext]{ref-lee_2000}
-Lee, Wai. 2000. \emph{Theory and Methodology of Tactical Asset
-Allocation}. John Wiley \& Sons.
-
-\bibitem[\citeproctext]{ref-liu_2012}
-Liu, Ying, Marie Rekkas, and Augustine Wong. 2012. {``Inference for the
-Sharpe Ratio Using a Likelihood-Based Approach.''} \emph{Journal of
-Probability and Statistics} 2012: 1--24.
-\url{https://doi.org/10.1155/2012/878561}.
+Fisher, R. A., \& Tippett, L. H. C. (1928). \emph{Limiting forms of the
+frequency distribution of the largest or smallest member of a sample}
+(Vol. 24, pp. 180--190). Cambridge University Press.
 
 \bibitem[\citeproctext]{ref-lo_2002}
-Lo, Andrew W. 2002. {``The Statistics of Sharpe Ratios.''}
-\emph{Financial Analysts Journal} 58 (July): 36--52.
-\url{https://doi.org/10.2469/faj.v58.n4.2453}.
+Lo, A. W. (2002). The statistics of sharpe ratios. \emph{Financial
+Analysts Journal}, \emph{58}, 36--52.
+\url{https://doi.org/10.2469/faj.v58.n4.2453}
 
 \bibitem[\citeproctext]{ref-resnick_2008}
-Resnick, Sidney I. 2008. \emph{Extreme Values, Regular Variation and
-Point Processes}. Springer, Cop.
+Resnick, S. I. (2008). \emph{Extreme values, regular variation and point
+processes}. Springer, Cop.
 
 \end{CSLReferences}
-
-\newpage
-
-\section{Appendix A : Code}\label{appendix-a-code}
-
-\section{Appendix B : Session
-Information}\label{appendix-b-session-information}
 
 \end{document}
